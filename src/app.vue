@@ -4,23 +4,21 @@
     </div>
 </template>
 <script>
+
 export default {
-    name: 'app'
-}
-    // export default {
-    //     data() {
-    //         return {
+    data() {
+        return {
 
-    //         };
-    //     },
-    //     mounted() {
+        };
+    },
+    mounted() {
 
-    //     },
-    //     beforeDestroy() {
+    },
+    beforeDestroy() {
 
-    //     },
-    //     methods: {
+    },
+    methods: {
 
-    //     }
-    // };
+    }
+};
 </script>

@@ -9,14 +9,20 @@ let win
 function createWindow() {
     // 创建浏览器窗口。
     win = new BrowserWindow({ width: 800, height: 600 })
-
+    
+    if(process.env.NODE_ENV == void 0 )process.env.NODE_ENV='production';
+    console.log(process.env.NODE_ENV);
     //加载应用的 index.html。
-    win.loadURL(url.format({
-        pathname: path.join(__dirname, 'dist/index_prod.html'),
-        protocol: 'file:',
-        slashes: true
-    }))
-    //win.loadURL('http://localhost:8080')
+    if (process.env.NODE_ENV === 'production'){
+        win.loadURL(url.format({
+            pathname: path.join(__dirname, 'dist/index_prod.html'),
+            protocol: 'file:',
+            slashes: true
+        }))
+    } else {
+        win.loadURL('http://localhost:8080')
+    }
+
 
     // 打开开发者工具。
     win.webContents.openDevTools();
