@@ -93,6 +93,8 @@ function exit(code) {
 //run('npm run dev',YELLOW)
 //而且必须这么写
 //这两个run几乎是同时的,是不会等第一个完全执行完毕
+//所以app界面需要等一会才会显示
+//虽然这个比较简介不过呢感觉还是用原来那个版本显示更清楚些,但就是有点不好看 
 run(`webpack-dev-server --inline --hot --colors --config webpack.dev.config.js --content-base ./`, YELLOW)
 //console.log(children.length)
 run('cross-env NODE_ENV=development electron .', BLUE)
