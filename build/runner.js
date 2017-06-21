@@ -8,6 +8,7 @@ const webpack = require('webpack')
 const WebpackDevServer = require('webpack-dev-server')
 const webpackHotMiddleware = require('webpack-hot-middleware')
 const rendererConfig = require('../webpack.dev.config')
+const mainConfig = require('../webpack.base.config')
 const path = require('path')
 
 let hotMiddleware
@@ -62,11 +63,19 @@ function startRenderer() {
       logStats('Renderer' + bb, stats)
     })
 
+    //就到这里吧 热更新也做了 可惜就是不自动刷新浏览器
+    //[WDS] App hot update... (执行到这里就不走了)
+    //dev-server.js:45 [HMR] Checking for updates on the server... (就差这一句 不知道为啥)
+    //这个写法真心没有命令行简单啊
     const server = new WebpackDevServer(
       compiler,
       {
         contentBase: path.join(__dirname, '../'),
         quiet: true,
+        publicPath: '/dist/',
+        hot: true,
+        compress: true,
+        historyApiFallback: true,
         setup(app, ctx) {
           app.use(hotMiddleware)
           ctx.middleware.waitUntilValid(() => {
@@ -76,6 +85,42 @@ function startRenderer() {
       }
     )
     server.listen(8080)
+
+
+    // 下面这段能捕捉到 文件更改并执行命令,可是没有electronProcess的刷新命令,而且删除好像也不好使
+    // const compiler1 = webpack(rendererConfig)
+
+    // compiler1.plugin('watch-run', (compilation, done) => {
+    //   logStats('Main', chalk.white.bold('compiling...'))
+    //   hotMiddleware.publish({ action: 'compiling' })
+    //   done()
+    // })
+
+    // compiler1.watch({}, (err, stats) => {
+    //   if (err) {
+    //     console.log(err)
+    //     return
+    //   }
+    //   aa++
+    //   console.log(aa + 'startMain');
+    //   logStats('Main', stats)
+    //   log('3333333333333333333333333333333333333333')
+    //   //没有这句不刷新了
+    //   // if (electronProcess && electronProcess.kill) {
+    //   //   log('3333333333333333333333333333333333333333')
+    //   //   manualRestart = true
+    //   //   process.kill(electronProcess.pid)
+    //   //   electronProcess = null
+    //   //   startElectron()
+
+    //   //   setTimeout(() => {
+    //   //     manualRestart = false
+    //   //   }, 5000)
+    //   // }
+    //   resolve()
+    // })
+
+
   })
 }
 
@@ -86,6 +131,7 @@ function startMain() {
     //mainConfig.entry.main = [path.join(__dirname, '../src/main/index.dev.js')].concat(mainConfig.entry.main)
 
     const compiler = webpack(rendererConfig)
+    //const compiler = webpack(mainConfig)
 
     compiler.plugin('watch-run', (compilation, done) => {
       logStats('Main', chalk.white.bold('compiling...'))
@@ -101,6 +147,7 @@ function startMain() {
       aa++
       console.log(aa + 'startMain');
       logStats('Main', stats)
+      //没有这句不刷新了
       if (electronProcess && electronProcess.kill) {
         log('3333333333333333333333333333333333333333')
         manualRestart = true
@@ -119,7 +166,7 @@ function startMain() {
 
 function startElectron() {
   //electronProcess = spawn(electron, ['--inspect=5858', path.join(__dirname, '../dist/electron/main.js')])
-  electronProcess = exec(`electron .`)
+  electronProcess = exec(`cross-env NODE_ENV=production1 electron .`)
   electronProcess.stdout.on('data', data => {
     electronLog(data, 'blue')
   })
@@ -177,15 +224,29 @@ function logStats(proc, data) {
 
 
 
+function startExe() {
+  return new Promise((resolve, reject) => {
+    const child = exec('webpack-dev-server --inline --hot --colors --config webpack.dev.config.js --content-base ./')
+    child.stdout.on('data', data => {
+      logStats('startExe', data)
+      //唉 又是这样 无论怎么延时 下面的命令都会提前执行
+      setTimeout(() => {
+        resolve()
+      }, 5000)
+    })
+
+  })
+}
 
 
 function init() {
   greeting()
- // startMain()
+  // startMain()
   //startRenderer()
-  // 修改了 index.html 已经可以使用了. 以前的问题主要是不能自动插入生成的静态文件
-  // 还有就是当更新的时候 又会打开新electron
-  Promise.all([startRenderer(),startMain()])
+  
+  //总是不完美啊 一个是无法自动刷新,一个是打开app界面太快
+  //但真心懒得弄下去了,玩到这里就算了,因为就算开项目也会用模版建立项目吧,不会这么笨的还手动调
+  Promise.all([startExe()])
     .then(() => {
       startElectron()
     })

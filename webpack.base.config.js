@@ -6,7 +6,6 @@ module.exports = {
     entry: {
         main: './src/main',
         vendors: './src/vendors',
-        //renderer: path.join(__dirname, '../src/renderer/main.js')
     },
     output: {
         path: path.join(__dirname, './dist')

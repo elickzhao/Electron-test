@@ -12,6 +12,12 @@ fs.open('./src/config/env.js', 'w', function (err, fd) {
 
 module.exports = merge(webpackBaseConfig, {
     devtool: '#source-map',
+    entry: ["webpack-dev-server/client?http://localhost:8080"],
+    entry: {
+        main: ["webpack-dev-server/client?http://localhost:8080",'./src/main'],
+        vendors: './src/vendors',
+    },
+    //entry:["webpack-dev-server/client?http://localhost:8080",'./src/main','./src/vendors'],
     output: {
         publicPath: '/dist/',
         filename: '[name].js',
