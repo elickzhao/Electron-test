@@ -38,7 +38,7 @@ module.exports = merge(webpackBaseConfig, {
         new HtmlWebpackPlugin({
             filename: '../dist/index_prod.html',
             template: './src/template/index.ejs',
-            // inject: false
+            inject: false
         })
     ]
 });
