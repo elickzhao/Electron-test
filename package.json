@@ -12,7 +12,8 @@
     "packager": "electron-packager . HelloWorld windows --out ./OutApp --version 1.6.11 --overwrite --ignore=client/node_modules ",
     "all": "cross-env NODE_ENV=production npm run dev && electron .",
     "dev:run": "node build/dev-runner.js",
-    "build:app": "node build/build.js"
+    "build:app": "node build/build.js",
+    "build:asar": "asar pack . app.asar"
   },
   "repository": {
     "type": "git",
@@ -38,6 +39,7 @@
     "webpack-hot-middleware": "^2.18.0"
   },
   "devDependencies": {
+    "asar": "^0.13.0",
     "autoprefixer-loader": "^2.0.0",
     "babel": "^6.23.0",
     "babel-core": "^6.23.1",
